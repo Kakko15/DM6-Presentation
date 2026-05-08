@@ -219,61 +219,71 @@
             .hero-icon{width:120px;height:60px}
         }
         @media(max-width:768px){
-            .slide{padding:32px 28px}
-            .slide-title{font-size:26px;gap:10px}
-            .slide-sub{font-size:15px}
-            .content-grid,.content-grid.three{grid-template-columns:1fr;gap:16px}
-            .m-card{padding:20px 22px;border-radius:16px}
-            .m-card h3{font-size:17px}
-            .m-card ul li{font-size:14px;line-height:1.7}
-            .full-card{padding:24px 20px}
-            .full-card ul li{font-size:15px}
-            .rq-item p{font-size:15px !important}
-            .rq-num{width:30px;height:30px;font-size:16px}
-            .hero-title-premium{font-size:38px;line-height:1.15}
-            .hero-subtitle-premium{font-size:16px;margin-bottom:24px}
-            .hero-icon{width:100px;height:50px;margin-bottom:16px}
-            .logo-row{gap:16px;margin-bottom:16px}
-            .logo-row img{width:44px;height:44px}
-            .logo-row img.logo-main{width:56px;height:56px}
-            .glass-chip{padding:10px 18px;font-size:13px;gap:8px}
-            .topic-badge{font-size:10px;padding:5px 14px}
-            .end-title{font-size:48px}
-            .end-subtitle{font-size:18px;margin-bottom:24px}
-            .team-row{flex-wrap:wrap;gap:12px;justify-content:center}
-            .team-member{min-width:100px;padding:16px 18px 14px}
-            .team-member .tm-icon{width:48px;height:48px}
-            .team-member .name{font-size:14px}
-            .team-member .role{font-size:10px}
-            .end-logos img{width:36px;height:36px}
-            .end-logos img[style]{width:44px !important;height:44px !important}
-            .stat-number{font-size:36px}
-            .controls{bottom:20px;right:20px;gap:8px}
-            .fab{width:40px;height:40px;font-size:15px}
-            .slide-num{bottom:24px;left:20px;font-size:12px}
-            .start-hint{bottom:24px;font-size:11px}
-            .bg-blue,.bg-red,.bg-yellow,.bg-green{padding:8px;font-size:18px;border-radius:10px}
+            body{overflow:hidden}
+            .slide{padding:32px 24px;overflow-y:auto;justify-content:flex-start}
+            .title-slide,.end-slide{justify-content:center;overflow:hidden}
+            .slide-header{margin-bottom:20px}
+            .slide-title{font-size:24px;gap:10px}
+            .slide-sub{font-size:14px}
+            .content-grid{display:grid !important;grid-template-columns:1fr !important;gap:14px}
+            .content-grid.three{grid-template-columns:1fr !important}
+            .m-card{padding:18px 20px;border-radius:14px}
+            .m-card h3{font-size:16px;gap:8px}
+            .m-card ul li{font-size:13px;line-height:1.65;padding-left:16px}
+            .full-card{padding:20px 18px}
+            .full-card ul li{font-size:14px}
+            .rq-item{gap:12px;padding:10px 0}
+            .rq-item p{font-size:14px !important}
+            .rq-num{width:28px;height:28px;font-size:15px}
+            .hero-title-premium{font-size:32px;line-height:1.15}
+            .hero-subtitle-premium{font-size:15px;margin-bottom:20px}
+            .hero-icon{width:90px;height:45px;margin-bottom:14px}
+            .logo-row{gap:14px;margin-bottom:14px}
+            .logo-row img{width:40px;height:40px}
+            .logo-row img.logo-main{width:52px;height:52px}
+            .glass-chip{padding:8px 16px;font-size:12px;gap:6px}
+            .topic-badge{font-size:9px;padding:4px 12px}
+            .end-title{font-size:44px}
+            .end-subtitle{font-size:16px;margin-bottom:20px}
+            .team-row{flex-wrap:wrap;gap:10px;justify-content:center}
+            .team-member{min-width:90px;padding:14px 16px 12px;border-radius:14px}
+            .team-member .tm-icon{width:44px;height:44px;margin-bottom:8px}
+            .team-member .name{font-size:13px}
+            .team-member .role{font-size:9px}
+            .end-logos img{width:32px;height:32px}
+            .end-logos img[style]{width:40px !important;height:40px !important}
+            .stat-number{font-size:32px}
+            .controls{bottom:16px;right:16px;gap:8px}
+            .fab{width:38px;height:38px;font-size:14px;border-radius:19px}
+            .slide-num{bottom:20px;left:16px;font-size:11px}
+            .start-hint{bottom:20px;font-size:10px}
+            .bg-blue,.bg-red,.bg-yellow,.bg-green{padding:7px;font-size:16px;border-radius:8px}
             .wave-deco{opacity:.05}
-            .pipeline{flex-wrap:wrap;gap:16px;justify-content:center}
+            .pipeline{flex-wrap:wrap;gap:12px;justify-content:center}
             .pipeline::before{display:none}
-            .pipe-step{width:120px}
+            .pipe-step{width:100px}
+            .pipe-step i{font-size:22px;padding:10px}
+            .pipe-step h4{font-size:13px}
         }
         @media(max-width:480px){
-            .slide{padding:24px 18px}
-            .slide-title{font-size:22px}
-            .hero-title-premium{font-size:28px}
-            .hero-subtitle-premium{font-size:14px;margin-bottom:20px}
-            .logo-row img{width:36px;height:36px}
-            .logo-row img.logo-main{width:46px;height:46px}
-            .hero-icon{width:80px;height:40px;margin-bottom:12px}
-            .glass-chip{padding:8px 14px;font-size:12px}
-            .end-title{font-size:36px}
-            .end-subtitle{font-size:15px}
-            .team-member{min-width:80px;padding:12px 14px 10px}
-            .team-member .tm-icon{width:40px;height:40px}
-            .m-card ul li{font-size:13px}
-            .stat-number{font-size:28px}
-            .slide-header{margin-bottom:20px}
+            .slide{padding:24px 16px}
+            .slide-title{font-size:20px}
+            .hero-title-premium{font-size:26px}
+            .hero-subtitle-premium{font-size:13px;margin-bottom:16px}
+            .logo-row img{width:34px;height:34px}
+            .logo-row img.logo-main{width:44px;height:44px}
+            .hero-icon{width:70px;height:35px;margin-bottom:10px}
+            .glass-chip{padding:7px 12px;font-size:11px}
+            .end-title{font-size:32px}
+            .end-subtitle{font-size:14px}
+            .team-member{min-width:75px;padding:10px 12px 8px}
+            .team-member .tm-icon{width:36px;height:36px}
+            .team-member .name{font-size:12px}
+            .m-card ul li{font-size:12px}
+            .m-card h3{font-size:15px}
+            .stat-number{font-size:26px}
+            .slide-header{margin-bottom:14px}
+            .full-card h3{font-size:18px !important}
         }
     </style>
 </head>
