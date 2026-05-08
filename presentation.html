@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electricity Forecasting Presentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root{--g-blue:#4285F4;--g-red:#EA4335;--g-yellow:#FBBC05;--g-green:#34A853;--surface:#FFF;--bg:#F8F9FA;--text:#202124;--text2:#5F6368;--outline:#DADCE0;--ease:cubic-bezier(.4,0,.2,1)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{background:var(--bg);color:var(--text);font-family:'Roboto',sans-serif;overflow:hidden;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+        h1,h2,h3,h4{font-family:'Outfit',sans-serif;letter-spacing:-.02em}
+        .deck{width:100vw;height:100vh;position:relative}
+        .slide{position:absolute;inset:0;padding:60px 100px;display:flex;flex-direction:column;justify-content:center;opacity:0;pointer-events:none;transform:scale(.96) translateX(40px);transition:all .7s var(--ease)}
+        .slide.active{opacity:1;pointer-events:auto;transform:scale(1) translateX(0)}
+        .slide.prev{transform:scale(.96) translateX(-40px)}
+        .slide-header{margin-bottom:36px;transform:translateY(20px);opacity:0;transition:all .6s var(--ease) .15s}
+        .slide.active .slide-header{transform:translateY(0);opacity:1}
+        .slide-title{font-size:42px;font-weight:600;display:flex;align-items:center;gap:14px}
+        .slide-sub{color:var(--text2);font-size:18px;margin-top:8px}
+        .g-dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+        .content-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+        .content-grid.three{grid-template-columns:1fr 1fr 1fr}
+        .m-card{background:var(--surface);border-radius:20px;padding:28px 32px;border:1px solid var(--outline);box-shadow:0 2px 8px rgba(0,0,0,.04);transform:translateY(30px);opacity:0;transition:all .6s var(--ease)}
+        .m-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.08);transform:translateY(-3px) !important}
+        .slide.active .m-card{transform:translateY(0);opacity:1}
+        .slide.active .m-card:nth-child(1){transition-delay:.3s}
+        .slide.active .m-card:nth-child(2){transition-delay:.45s}
+        .slide.active .m-card:nth-child(3){transition-delay:.6s}
+        .m-card h3{font-size:20px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+        .m-card ul{list-style:none;padding:0}
+        .m-card ul li{font-size:16px;line-height:1.8;color:var(--text2);padding-left:20px;position:relative}
+        .m-card ul li::before{content:"•";position:absolute;left:0;color:var(--g-blue);font-weight:700}
+        .m-card.border-blue{border-left:4px solid var(--g-blue)}
+        .m-card.border-red{border-left:4px solid var(--g-red)}
+        .m-card.border-green{border-left:4px solid var(--g-green)}
+        .m-card.border-yellow{border-left:4px solid var(--g-yellow)}
+        .m-card.border-top-red{border-top:5px solid var(--g-red);border-left:none}
+        .m-card.border-top-blue{border-top:5px solid var(--g-blue);border-left:none}
+        .m-card.border-top-green{border-top:5px solid var(--g-green);border-left:none}
+        .full-card{background:var(--surface);border-radius:20px;padding:36px 44px;border:1px solid var(--outline);border-left:4px solid var(--g-red);transform:translateY(30px);opacity:0;transition:all .6s var(--ease) .3s}
+        .slide.active .full-card{transform:translateY(0);opacity:1}
+        .rq-item{display:flex;gap:16px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--outline)}
+        .rq-item:last-child{border-bottom:none}
+        .rq-num{font-family:'Outfit';font-weight:700;font-size:20px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .rq-num.n1{background:rgba(66,133,244,.1);color:var(--g-blue)}
+        .rq-num.n2{background:rgba(234,67,53,.1);color:var(--g-red)}
+        .rq-num.n3{background:rgba(52,168,83,.1);color:var(--g-green)}
+        .bg-blue{background:rgba(66,133,244,.1);color:var(--g-blue);padding:10px;border-radius:12px;font-size:22px}
+        .bg-red{background:rgba(234,67,53,.1);color:var(--g-red);padding:10px;border-radius:12px;font-size:22px}
+        .bg-yellow{background:rgba(251,188,5,.1);color:#d99f00;padding:10px;border-radius:12px;font-size:22px}
+        .bg-green{background:rgba(52,168,83,.1);color:var(--g-green);padding:10px;border-radius:12px;font-size:22px}
+        .text-blue{color:var(--g-blue)}.text-red{color:var(--g-red)}.text-green{color:var(--g-green)}
+        .title-slide{align-items:center;text-align:center;overflow:hidden;padding:0}
+        .hero-title{font-size:72px;line-height:1.1;margin-bottom:20px;position:relative;z-index:2}
+        .hero-subtitle{font-size:26px;color:var(--text2);margin-bottom:40px;font-weight:300;position:relative;z-index:2}
+        .chip{background:var(--surface);padding:10px 22px;border-radius:32px;border:1px solid var(--outline);font-size:15px;color:var(--text2);display:inline-flex;gap:10px;align-items:center}
+
+        /* ═══ DECK BACKGROUND ═══ */
+        .deck-bg{position:absolute;inset:0;overflow:hidden;z-index:0}
+        .deck-bg .mesh{position:absolute;border-radius:50%;filter:blur(100px);opacity:.12;animation:meshFloat 12s ease-in-out infinite}
+        .deck-bg .mesh.m1{width:600px;height:600px;background:var(--g-blue);top:-15%;left:-10%;animation-delay:0s}
+        .deck-bg .mesh.m2{width:500px;height:500px;background:var(--g-red);bottom:-20%;right:-5%;animation-delay:-4s}
+        .deck-bg .mesh.m3{width:450px;height:450px;background:var(--g-green);top:40%;left:55%;animation-delay:-8s}
+        .deck-bg .mesh.m4{width:350px;height:350px;background:var(--g-yellow);top:10%;right:20%;animation-delay:-6s}
+        @keyframes meshFloat{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-20px) scale(1.05)}50%{transform:translate(-20px,30px) scale(.95)}75%{transform:translate(15px,15px) scale(1.02)}}
+        .deck-bg .grid-overlay{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(0,0,0,.03) 1px,transparent 1px);background-size:32px 32px}
+
+        .orb{position:absolute;border-radius:50%;z-index:1;opacity:0}
+        .title-slide.active .orb{opacity:1}
+        .orb.o1{width:10px;height:10px;background:var(--g-blue);top:18%;left:12%;animation:orbDrift 8s ease-in-out infinite,orbFade 2s var(--ease) .5s forwards}
+        .orb.o2{width:7px;height:7px;background:var(--g-red);top:25%;right:18%;animation:orbDrift 10s ease-in-out infinite reverse,orbFade 2s var(--ease) .7s forwards}
+        .orb.o3{width:12px;height:12px;background:var(--g-green);bottom:22%;left:22%;animation:orbDrift 9s ease-in-out infinite,orbFade 2s var(--ease) .9s forwards}
+        .orb.o4{width:8px;height:8px;background:var(--g-yellow);bottom:30%;right:14%;animation:orbDrift 7s ease-in-out infinite reverse,orbFade 2s var(--ease) 1.1s forwards}
+        .orb.o5{width:6px;height:6px;background:var(--g-blue);top:60%;left:8%;animation:orbDrift 11s ease-in-out infinite,orbFade 2s var(--ease) .6s forwards}
+        .orb.o6{width:9px;height:9px;background:var(--g-red);top:15%;left:65%;animation:orbDrift 8.5s ease-in-out infinite reverse,orbFade 2s var(--ease) 1s forwards}
+        @keyframes orbDrift{0%,100%{transform:translate(0,0)}33%{transform:translate(20px,-15px)}66%{transform:translate(-15px,20px)}}
+        @keyframes orbFade{from{opacity:0}to{opacity:.6}}
+
+        .title-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center}
+
+        /* Staggered entrance */
+        .title-content .anim-in{opacity:0;transform:translateY(40px);transition:all .8s var(--ease)}
+        .title-slide.active .anim-in.a0{opacity:1;transform:translateY(0);transition-delay:.1s}
+        .title-slide.active .anim-in.a1{opacity:1;transform:translateY(0);transition-delay:.25s}
+        .title-slide.active .anim-in.a2{opacity:1;transform:translateY(0);transition-delay:.5s}
+        .title-slide.active .anim-in.a3{opacity:1;transform:translateY(0);transition-delay:.7s}
+        .title-slide.active .anim-in.a4{opacity:1;transform:translateY(0);transition-delay:.9s}
+        .title-slide.active .anim-in.a5{opacity:1;transform:translateY(0);transition-delay:1.05s}
+        .title-slide.active .anim-in.a6{opacity:1;transform:translateY(0);transition-delay:1.2s}
+        .title-slide.active .anim-in.a7{opacity:1;transform:translateY(0);transition-delay:1.35s}
+
+        /* Logo row */
+        .logo-row{display:flex;gap:28px;align-items:center;margin-bottom:24px}
+        .logo-row img{width:72px;height:72px;object-fit:cover;border-radius:50%;transition:all .4s var(--ease)}
+        .logo-row img.logo-main{width:88px;height:88px}
+        .logo-row img:hover{transform:translateY(-3px) scale(1.08)}
+
+
+        /* Animated energy chart icon */
+        .hero-icon{margin-bottom:28px;position:relative;width:160px;height:80px}
+        .hero-icon svg{width:100%;height:100%}
+        .hero-icon .chart-line{stroke-dasharray:300;stroke-dashoffset:300;animation:none}
+        .title-slide.active .hero-icon .chart-line{animation:drawLine 2s var(--ease) .3s forwards}
+        .hero-icon .bolt{opacity:0;transform:scale(0);transform-origin:center;animation:none}
+        .title-slide.active .hero-icon .bolt{animation:boltPop .5s var(--ease) 1.8s forwards}
+        @keyframes drawLine{to{stroke-dashoffset:0}}
+        @keyframes boltPop{to{opacity:1;transform:scale(1)}}
+
+
+        /* Gradient title text */
+        .hero-title-premium{font-size:74px;line-height:1.08;margin-bottom:16px;font-weight:700;background:linear-gradient(135deg,#202124 0%,#4285F4 40%,#EA4335 60%,#202124 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 8s ease infinite}
+        @keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+        /* Electric shimmer on "Electricity" word */
+        .electric-text{position:relative;display:inline-block;-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#4285F4 0%,#4285F4 40%,#a8d4ff 50%,#4285F4 60%,#4285F4 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;animation:electricShimmer 3s ease-in-out infinite}
+        .electric-text::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,transparent 0%,rgba(66,133,244,.15) 45%,rgba(168,212,255,.3) 50%,rgba(66,133,244,.15) 55%,transparent 100%);background-size:250% 100%;animation:electricShimmer 3s ease-in-out infinite;border-radius:8px;pointer-events:none;filter:blur(6px)}
+        @keyframes electricShimmer{0%,100%{background-position:150% center}50%{background-position:-50% center}}
+
+
+        .hero-subtitle-premium{font-size:24px;color:var(--text2);margin-bottom:44px;font-weight:300;letter-spacing:.01em}
+
+        /* Glass chips */
+        .glass-chip{background:rgba(255,255,255,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:12px 28px;border-radius:40px;border:1px solid rgba(255,255,255,.5);font-size:15px;color:var(--text2);display:inline-flex;gap:10px;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,.04);transition:all .4s var(--ease)}
+        .glass-chip:hover{box-shadow:0 8px 30px rgba(66,133,244,.12);transform:translateY(-2px)}
+
+        /* SVG wave decoration */
+        .wave-deco{position:absolute;bottom:0;left:0;width:100%;z-index:1;opacity:.08}
+
+        /* Divider line */
+        .hero-line{width:100px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--g-blue),var(--g-red),var(--g-yellow),var(--g-green));margin-bottom:28px}
+
+        /* Topic badge */
+        .topic-badge{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--g-blue);background:rgba(66,133,244,.08);padding:6px 18px;border-radius:20px;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px}
+
+        /* Start hint */
+        .start-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);font-size:13px;color:var(--text2);opacity:0;display:flex;align-items:center;gap:8px;z-index:3}
+        .title-slide.active .start-hint{animation:hintFade 1s var(--ease) 2s forwards}
+        .start-hint .arrow-bounce{display:inline-block;animation:arrowBounce 1.5s ease-in-out infinite}
+        @keyframes hintFade{to{opacity:.5}}
+        @keyframes arrowBounce{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+
+        /* Hide UI in fullscreen */
+        body.is-fs .controls,body.is-fs .slide-num,body.is-fs .progress-container,body.is-fs .start-hint{opacity:0 !important;pointer-events:none;transition:opacity .4s var(--ease)}
+
+        .stat-number{font-size:56px;font-family:'Outfit';font-weight:700;line-height:1}
+        .full-card{background:var(--surface);border-radius:20px;padding:36px 44px;border:1px solid var(--outline)}
+        .full-card ul li{font-size:17px;line-height:1.8;color:var(--text2);padding-left:22px;position:relative}
+        .full-card ul li::before{content:"•";position:absolute;left:0;color:var(--g-blue);font-weight:700}
+        .full-card ul{list-style:none;padding:0}
+        .pipeline{display:flex;justify-content:space-between;position:relative;padding:20px 0}
+        .pipeline::before{content:'';position:absolute;top:42px;left:60px;right:60px;height:3px;background:var(--outline)}
+        .pipe-step{z-index:1;text-align:center;width:150px;background:var(--surface)}
+        .pipe-step i{font-size:28px;padding:14px;border-radius:50%;background:white}
+        .pipe-step h4{margin-top:12px;font-size:16px}
+        .pipe-step p{font-size:13px;color:var(--text2);margin-top:4px}
+        .controls{position:fixed;bottom:30px;right:50px;display:flex;gap:12px;z-index:100}
+        .fab{width:50px;height:50px;border-radius:25px;background:var(--surface);border:1px solid var(--outline);box-shadow:0 1px 3px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--text2);transition:all .3s var(--ease)}
+        .fab:hover{background:var(--bg);color:var(--g-blue);box-shadow:0 3px 8px rgba(0,0,0,.15)}
+        .progress-container{position:fixed;top:0;left:0;width:100%;height:4px;background:rgba(0,0,0,.05);z-index:100}
+        .progress-bar{height:100%;background:var(--g-blue);width:0%;transition:width .6s var(--ease);border-radius:0 4px 4px 0}
+        .slide-num{position:fixed;bottom:36px;left:50px;font-size:14px;color:var(--text2);z-index:100}
+        .end-slide{align-items:center;text-align:center;overflow:hidden;padding:0}
+        .end-slide .end-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center}
+        .end-title{font-size:88px;font-weight:700;margin-bottom:6px;background:linear-gradient(135deg,#202124 0%,#4285F4 35%,#34A853 65%,#202124 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 8s ease infinite}
+        .end-subtitle{font-size:22px;color:var(--text2);font-weight:300;margin-bottom:32px;display:flex;align-items:center;gap:8px}
+        .end-dots{display:flex;gap:10px;margin-bottom:28px}
+        .end-dots .g-dot{width:14px;height:14px}
+        .end-slide.active .end-dots .g-dot{animation:dotPulse 2.5s ease-in-out infinite}
+        .end-slide.active .end-dots .g-dot:nth-child(1){animation-delay:0s}
+        .end-slide.active .end-dots .g-dot:nth-child(2){animation-delay:.2s}
+        .end-slide.active .end-dots .g-dot:nth-child(3){animation-delay:.4s}
+        .end-slide.active .end-dots .g-dot:nth-child(4){animation-delay:.6s}
+        @keyframes dotPulse{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.4);opacity:1}}
+        .end-content .anim-e{opacity:0;transform:translateY(30px);transition:all .7s var(--ease)}
+        .end-slide.active .anim-e.e1{opacity:1;transform:translateY(0);transition-delay:.2s}
+        .end-slide.active .anim-e.e2{opacity:1;transform:translateY(0);transition-delay:.4s}
+        .end-slide.active .anim-e.e3{opacity:1;transform:translateY(0);transition-delay:.55s}
+        .end-slide.active .anim-e.e4{opacity:1;transform:translateY(0);transition-delay:.7s}
+        .end-slide.active .anim-e.e5{opacity:1;transform:translateY(0);transition-delay:.85s}
+        .end-slide.active .anim-e.e6{opacity:1;transform:translateY(0);transition-delay:1s}
+        .team-row{display:flex;gap:20px;margin-bottom:24px}
+        .team-member{background:rgba(255,255,255,.75);backdrop-filter:blur(14px);padding:22px 28px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.5);text-align:center;transition:all .4s var(--ease);min-width:130px;border-top:4px solid var(--outline)}
+        .team-member:nth-child(1){border-top-color:var(--g-blue)}
+        .team-member:nth-child(2){border-top-color:var(--g-red)}
+        .team-member:nth-child(3){border-top-color:var(--g-yellow)}
+        .team-member:nth-child(4){border-top-color:var(--g-green)}
+        .team-member:hover{transform:translateY(-5px);box-shadow:0 12px 28px rgba(0,0,0,.1)}
+        .team-member .tm-icon{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:18px;overflow:hidden;padding:3px}
+        .team-member:nth-child(1) .tm-icon{background:linear-gradient(135deg,var(--g-blue),#6da8f7)}
+        .team-member:nth-child(2) .tm-icon{background:linear-gradient(135deg,var(--g-red),#f07068)}
+        .team-member:nth-child(3) .tm-icon{background:linear-gradient(135deg,var(--g-yellow),#fcd462)}
+        .team-member:nth-child(4) .tm-icon{background:linear-gradient(135deg,var(--g-green),#5ec77a)}
+        .team-member .tm-icon img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        .team-member .tm-icon svg{width:100%;height:100%;border-radius:50%}
+        .team-member .name{font-family:'Outfit';font-weight:600;font-size:16px;color:var(--text)}
+        .team-member .role{font-size:12px;color:var(--text2);margin-top:3px;letter-spacing:.04em;text-transform:uppercase;font-weight:500}
+        .end-orb{position:absolute;border-radius:50%;z-index:1;opacity:0}
+        .end-slide.active .end-orb{opacity:.5}
+        .end-orb.eo1{width:10px;height:10px;background:var(--g-blue);top:20%;left:15%;animation:orbDrift 9s ease-in-out infinite}
+        .end-orb.eo2{width:8px;height:8px;background:var(--g-red);top:28%;right:12%;animation:orbDrift 7s ease-in-out infinite reverse}
+        .end-orb.eo3{width:12px;height:12px;background:var(--g-green);bottom:25%;left:20%;animation:orbDrift 10s ease-in-out infinite}
+        .end-orb.eo4{width:7px;height:7px;background:var(--g-yellow);bottom:35%;right:18%;animation:orbDrift 8s ease-in-out infinite reverse}
+        .end-logos{display:flex;gap:16px;align-items:center;margin-bottom:20px}
+        .end-logos img{width:44px;height:44px;object-fit:cover;border-radius:50%;opacity:.8;transition:all .3s var(--ease)}
+        .end-logos img:hover{opacity:1;transform:scale(1.1)}
+    </style>
+</head>
+<body>
+<div class="progress-container"><div class="progress-bar" id="progress"></div></div>
+<div class="slide-num" id="slideNum">1 / 11</div>
+
+<div class="deck">
+
+<!-- Shared animated background -->
+<div class="deck-bg">
+    <div class="mesh m1"></div>
+    <div class="mesh m2"></div>
+    <div class="mesh m3"></div>
+    <div class="mesh m4"></div>
+    <div class="grid-overlay"></div>
+</div>
+
+<!-- SLIDE 1: TITLE (ULTRA PREMIUM) -->
+<section class="slide title-slide active">
+
+    <!-- Floating orbs -->
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="orb o3"></div>
+    <div class="orb o4"></div>
+    <div class="orb o5"></div>
+    <div class="orb o6"></div>
+
+    <!-- Content with staggered entrance -->
+    <div class="title-content">
+        <div class="topic-badge anim-in a0"><i class="fa-solid fa-cube" style="font-size:10px"></i> Topic 5: Mining Time Series & Spatiotemporal Data</div>
+        <div class="logo-row anim-in a1">
+            <img src="CCSICT_Logo.jpg" alt="CCSICT Logo">
+            <img src="ISU_Logo.jpg" alt="ISU Logo" class="logo-main">
+            <img src="CS_Logo.jpg" alt="CS Logo">
+        </div>
+        <div class="hero-icon anim-in a2">
+            <svg viewBox="0 0 120 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="chart-line" d="M8,52 L24,40 L38,46 L52,22 L66,30 L80,12 L94,20 L112,8" stroke="#4285F4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path class="chart-line" d="M8,56 L24,50 L38,54 L52,44 L66,48 L80,38 L94,42 L112,34" stroke="#34A853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".4" style="animation-delay:.5s"/>
+                <path class="bolt" d="M104,4 L99,16 L105,16 L100,28" stroke="#FBBC05" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+        </div>
+        <h1 class="hero-title-premium anim-in a3"><span class="electric-text">Electricity</span> Consumption<br>Forecasting & Anomaly Detection</h1>
+        <h2 class="hero-subtitle-premium anim-in a4">Using ARIMA for Energy Usage Optimization</h2>
+        <div class="anim-in a5 glass-chip" style="margin-bottom:12px"><i class="fa-solid fa-users text-blue"></i> Bugauisan · Respicio · Barlis · Gallardo</div>
+        <div class="anim-in a6 glass-chip"><i class="fa-solid fa-graduation-cap text-red"></i> BSCS &nbsp;|&nbsp; Instructor: Benedick V. Yamat &nbsp;|&nbsp; May 2026</div>
+    </div>
+
+    <!-- Start hint -->
+    <div class="start-hint">Press <span class="arrow-bounce">→</span> to begin</div>
+
+    <!-- Decorative wave -->
+    <svg class="wave-deco" viewBox="0 0 1440 200" preserveAspectRatio="none">
+        <path d="M0,120 C240,180 480,60 720,120 C960,180 1200,60 1440,120 L1440,200 L0,200 Z" fill="#4285F4"/>
+        <path d="M0,140 C300,190 600,90 900,140 C1100,170 1300,100 1440,140 L1440,200 L0,200 Z" fill="#34A853" opacity=".5"/>
+    </svg>
+</section>
+
+<!-- SLIDE 2: BACKGROUND -->
+<section class="slide">
+    <div class="slide-header">
+        <h2 class="slide-title"><span class="g-dot" style="background:var(--g-blue)"></span> Background of the Study</h2>
+        <p class="slide-sub">Why electricity forecasting matters for modern energy systems.</p>
+    </div>
+    <div class="content-grid">
+        <div class="m-card border-blue">
+            <h3><i class="bg-blue fa-solid fa-city"></i> Growing Demand</h3>
+            <ul>
+                <li>Electricity demand rises due to urbanization and technology</li>
+                <li>Developing regions (incl. Philippines) lack monitoring tools</li>
+                <li>Results in energy inefficiencies, losses, and high costs</li>
+            </ul>
+        </div>
+        <div class="m-card border-green">
+            <h3><i class="bg-green fa-solid fa-chart-line"></i> Time-Series Forecasting</h3>
+            <ul>
+                <li>ARIMA is widely used for its simplicity and interpretability</li>
+                <li>Effective on univariate data with limited resources</li>
+                <li>Anomaly detection complements forecasting by flagging unusual patterns</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 3: PROBLEM STATEMENT -->
+<section class="slide">
+    <div class="slide-header">
+        <h2 class="slide-title"><span class="g-dot" style="background:var(--g-red)"></span> Problem Statement</h2>
+        <p class="slide-sub">Despite available historical data, many systems fail to use it effectively.</p>
+    </div>
+    <div class="full-card">
+        <h3 style="margin-bottom:20px;font-size:22px">Research Questions</h3>
+        <div class="rq-item">
+            <div class="rq-num n1">1</div>
+            <p style="font-size:17px;color:var(--text2);line-height:1.6">How can historical electricity consumption data be used to <strong>accurately forecast</strong> future usage?</p>
+        </div>
+        <div class="rq-item">
+            <div class="rq-num n2">2</div>
+            <p style="font-size:17px;color:var(--text2);line-height:1.6">How can <strong>abnormal or unusual</strong> consumption patterns be detected effectively?</p>
+        </div>
+        <div class="rq-item">
+            <div class="rq-num n3">3</div>
+            <p style="font-size:17px;color:var(--text2);line-height:1.6">How can forecasting and anomaly detection be <strong>integrated</strong> to support energy usage optimization?</p>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 4: OBJECTIVES -->
+<section class="slide">
+    <div class="slide-header">
+        <h2 class="slide-title"><span class="g-dot" style="background:var(--g-green)"></span> Objectives of the Study</h2>
+    </div>
+    <div class="content-grid">
+        <div class="m-card border-blue">
+            <h3><i class="bg-blue fa-solid fa-bullseye"></i> General Objective</h3>
+            <ul>
+                <li>Develop a case study-based system that <strong>forecasts electricity consumption</strong> and <strong>detects anomalies</strong> to support energy usage optimization</li>
+            </ul>
+        </div>
+        <div class="m-card border-green">
+            <h3><i class="bg-green fa-solid fa-list-check"></i> Specific Objectives</h3>
+            <ul>
+                <li>Analyze real-world electricity data using time series techniques</li>
+                <li>Implement <strong>ARIMA</strong> for forecasting future demand</li>
+                <li>Auto-determine optimal ARIMA parameters</li>
+                <li>Evaluate performance using <strong>MAE, RMSE, MAPE</strong></li>
+                <li>Detect anomalies using the <strong>Z-score</strong> method</li>
+                <li>Visualize and interpret results for practical insights</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 5: RELATED LITERATURE -->
+<section class="slide">
+    <div class="slide-header">
+        <h2 class="slide-title"><span class="g-dot" style="background:var(--g-yellow)"></span> Review of Related Literature</h2>
+        <p class="slide-sub">Existing research foundations and identified gap.</p>
+    </div>
+    <div class="content-grid">
+        <div class="m-card border-yellow">
+            <h3><i class="bg-yellow fa-solid fa-book"></i> Key Studies</h3>
+            <ul>
+                <li><strong>Box et al. (2015)</strong> — ARIMA as standard in time-series</li>
+                <li><strong>Hyndman (2021)</strong> — Reliable for short-term forecasting</li>
+                <li><strong>Taylor (2010)</strong> — Competes with complex models</li>
+                <li><strong>Chandola et al. (2009)</strong> — Residual anomaly detection</li>
+            </ul>
+        </div>
+        <div class="m-card border-red">
+            <h3><i class="bg-red fa-solid fa-magnifying-glass"></i> Research Gap</h3>
+            <ul>
+                <li>Studies treat forecasting and anomaly detection <strong>separately</strong></li>
+                <li>Few integrate both into a <strong>single accessible framework</strong></li>
+                <li>This study bridges the gap with a <strong>unified ARIMA + Z-score</strong> pipeline</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 6: DATASET -->
+<section class="slide">
+    <div class="slide-header">
+        <h2 class="slide-title"><span class="g-dot" style="background:var(--g-blue)"></span> Dataset & Preprocessing</h2>
+        <p class="slide-sub">Preparing the data for analysis and modeling.</p>
+    </div>
+    <div class="content-grid">
+        <div class="m-card border-blue">
+            <h3><i class="bg-blue fa-solid fa-database"></i> PJM East Dataset</h3>
+            <ul>
+                <li>Publicly available electricity load dataset</li>
+                <li><strong>145,363 records</strong> of hourly consumption</li>
+                <li>Measured in <strong>megawatts (MW)</strong></li>
+                <li>Date range: <strong>2002 onwards</strong></li>
+            </ul>
+        </div>
+        <div class="m-card border-green">
+            <h3><i class="bg-green fa-solid fa-filter"></i> Preprocessing Steps</h3>
+            <ul>
+                <li>Convert datetime column to proper format</li>
+                <li>Sort records chronologically</li>
+                <li>Remove duplicate timestamps via aggregation</li>
+                <li>Handle missing values via resampling + averaging</li>
+                <li>Resample to daily, weekly, or monthly</li>
+                <li><strong>80% training / 20% testing</strong> (chronological)</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 7: METHODOLOGY — ARIMA -->
+<section class="slide">
+    <div class="slide-header">
+        <h2 class="slide-title"><span class="g-dot" style="background:var(--g-green)"></span> Methodology: ARIMA Model</h2>
+        <p class="slide-sub">Autoregressive Integrated Moving Average — the core forecasting engine.</p>
+    </div>
+    <div class="content-grid">
+        <div class="m-card border-green">
+            <h3><i class="bg-green fa-solid fa-gears"></i> ARIMA(p, d, q)</h3>
+            <ul>
+                <li><strong>p</strong> — Autoregressive order (past values)</li>
+                <li><strong>d</strong> — Degree of differencing (stationarity)</li>
+                <li><strong>q</strong> — Moving average order (past errors)</li>
+                <li>Assumes linear relationships and stationarity</li>
+            </ul>
+        </div>
+        <div class="m-card border-blue">
+            <h3><i class="bg-blue fa-solid fa-sliders"></i> Automatic Parameter Selection</h3>
+            <ul>
+                <li><strong>ADF Test</strong> — checks stationarity, auto-differencing</li>
+                <li><strong>ACF/PACF</strong> — identifies candidate p and q values</li>
+                <li><strong>BIC Grid Search</strong> — selects lowest BIC combination</li>
+                <li>Forecasts with <strong>95% confidence intervals</strong></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 8: METHODOLOGY — ANOMALY -->
+<section class="slide">
+    <div class="slide-header">
+        <h2 class="slide-title"><span class="g-dot" style="background:var(--g-red)"></span> Methodology: Anomaly Detection</h2>
+        <p class="slide-sub">Statistical thresholding to flag unusual consumption events.</p>
+    </div>
+    <div class="content-grid">
+        <div class="m-card border-red">
+            <h3><i class="bg-red fa-solid fa-triangle-exclamation"></i> Z-Score Method</h3>
+            <ul>
+                <li>Formula: <strong>Z = (value − mean) / std</strong></li>
+                <li>Threshold: <strong>±3 standard deviations</strong></li>
+                <li>Values beyond ±3σ flagged as anomalies</li>
+                <li>Visualized as <strong>red points</strong> on the chart</li>
+            </ul>
+        </div>
+        <div class="m-card border-yellow">
+            <h3><i class="bg-yellow fa-solid fa-lightbulb"></i> What Anomalies May Indicate</h3>
+            <ul>
+                <li>Peak demand periods</li>
+                <li>Equipment malfunction or inefficiencies</li>
+                <li>Energy theft or data errors</li>
+                <li>Abnormal usage behavior</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 9: RESULTS -->
+<section class="slide">
+    <div class="slide-header">
+        <h2 class="slide-title"><span class="g-dot" style="background:var(--g-yellow)"></span> Results</h2>
+        <p class="slide-sub">Key findings from the forecasting and anomaly detection system.</p>
+    </div>
+    <div class="content-grid three">
+        <div class="m-card border-top-red" style="text-align:center">
+            <div class="stat-number text-red">138</div>
+            <h3 style="justify-content:center;margin-top:10px">Anomalies Detected</h3>
+            <ul>
+                <li>Flagged via Z-score at ±3σ</li>
+                <li>Unusually high consumption</li>
+            </ul>
+        </div>
+        <div class="m-card border-top-blue" style="text-align:center">
+            <div class="stat-number text-blue">3</div>
+            <h3 style="justify-content:center;margin-top:10px">Evaluation Metrics</h3>
+            <ul>
+                <li><strong>MAE</strong> — avg prediction error</li>
+                <li><strong>RMSE</strong> — penalizes large errors</li>
+                <li><strong>MAPE</strong> — percentage error</li>
+            </ul>
+        </div>
+        <div class="m-card border-top-green" style="text-align:center">
+            <div class="stat-number text-green">95%</div>
+            <h3 style="justify-content:center;margin-top:10px">Confidence Interval</h3>
+            <ul>
+                <li>Uncertainty bounds included</li>
+                <li>Widens for longer forecasts</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 10: CONCLUSION & RECOMMENDATIONS -->
+<section class="slide">
+    <div class="slide-header">
+        <h2 class="slide-title"><span class="g-dot" style="background:var(--g-blue)"></span> Conclusion & Recommendations</h2>
+    </div>
+    <div class="content-grid">
+        <div class="m-card border-green">
+            <h3><i class="bg-green fa-solid fa-circle-check"></i> Conclusion</h3>
+            <ul>
+                <li>ARIMA is <strong>effective and interpretable</strong> for short-term forecasting</li>
+                <li>Z-score provides <strong>simple, practical</strong> anomaly detection</li>
+                <li>Integrated system supports <strong>energy monitoring</strong> and decision-making</li>
+                <li>Deployed as an interactive <strong>Streamlit web application</strong></li>
+            </ul>
+        </div>
+        <div class="m-card border-yellow">
+            <h3><i class="bg-yellow fa-solid fa-rocket"></i> Recommendations</h3>
+            <ul>
+                <li>Use hybrid models (e.g., ARIMA + LSTM) for improved accuracy</li>
+                <li>Incorporate weather and economic factors</li>
+                <li>Implement real-time monitoring systems</li>
+                <li>Apply advanced anomaly detection (ML-based)</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 11: THANK YOU (ULTRA PREMIUM) -->
+<section class="slide end-slide">
+    <!-- Floating orbs -->
+    <div class="end-orb eo1"></div>
+    <div class="end-orb eo2"></div>
+    <div class="end-orb eo3"></div>
+    <div class="end-orb eo4"></div>
+
+    <div class="end-content">
+        <div class="end-logos anim-e e1">
+            <img src="CCSICT_Logo.jpg" alt="CCSICT">
+            <img src="ISU_Logo.jpg" alt="ISU" style="width:56px;height:56px">
+            <img src="CS_Logo.jpg" alt="CS">
+        </div>
+        <h1 class="end-title anim-e e1">Thank You!</h1>
+        <p class="end-subtitle anim-e e2"><i class="fa-regular fa-comment-dots" style="color:var(--g-blue);font-size:18px"></i> Questions & Discussion</p>
+        <div class="team-row anim-e e3">
+            <div class="team-member"><div class="tm-icon"><img src="Bugauisan.png" alt="Bugauisan"></div><div class="name">Bugauisan</div><div class="role">Programmer</div></div>
+            <div class="team-member"><div class="tm-icon"><img src="Respecio.jpg" alt="Respicio"></div><div class="name">Respicio</div><div class="role">Researcher</div></div>
+            <div class="team-member"><div class="tm-icon"><img src="Barlis.png" alt="Barlis"></div><div class="name">Barlis</div><div class="role">Programmer</div></div>
+            <div class="team-member"><div class="tm-icon"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#DADCE0"/><circle cx="24" cy="18" r="8" fill="#9AA0A6"/><path d="M6,44 C6,34 14,28 24,28 C34,28 42,34 42,44" fill="#9AA0A6"/></svg></div><div class="name">Gallardo</div><div class="role">Researcher</div></div>
+        </div>
+        <div class="anim-e e4 glass-chip" style="margin-bottom:10px"><img src="CS_Logo.jpg" alt="CS" style="width:22px;height:22px;border-radius:50%;object-fit:cover"> BSCS &nbsp;|&nbsp; Instructor: Benedick V. Yamat</div>
+        <div class="anim-e e5 glass-chip"><i class="fa-brands fa-github" style="color:var(--text)"></i> github.com/ahronpro123456789-maker/energy-forecaster</div>
+    </div>
+    <svg style="position:absolute;bottom:0;left:0;width:100%;z-index:1;opacity:.04" viewBox="0 0 1440 200" preserveAspectRatio="none">
+        <path d="M0,120 C240,180 480,60 720,120 C960,180 1200,60 1440,120 L1440,200 L0,200 Z" fill="#4285F4"/>
+        <path d="M0,150 C360,200 720,80 1080,150 C1260,185 1380,120 1440,150 L1440,200 L0,200 Z" fill="#34A853" opacity=".5"/>
+    </svg>
+</section>
+
+</div>
+
+<div class="controls">
+    <button class="fab" id="prevBtn" onclick="navigate(-1)"><i class="fa-solid fa-arrow-left"></i></button>
+    <button class="fab" id="nextBtn" onclick="navigate(1)"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide'),bar=document.getElementById('progress'),num=document.getElementById('slideNum');
+let cur=0;
+function update(){
+    slides.forEach((s,i)=>{s.classList.remove('active','prev');if(i===cur)s.classList.add('active');else if(i<cur)s.classList.add('prev')});
+    bar.style.width=`${(cur/(slides.length-1))*100}%`;
+    num.textContent=`${cur+1} / ${slides.length}`;
+    document.getElementById('prevBtn').style.opacity=cur===0?'.3':'1';
+    document.getElementById('prevBtn').style.pointerEvents=cur===0?'none':'auto';
+    document.getElementById('nextBtn').style.opacity=cur===slides.length-1?'.3':'1';
+    document.getElementById('nextBtn').style.pointerEvents=cur===slides.length-1?'none':'auto';
+}
+function navigate(d){cur+=d;if(cur<0)cur=0;if(cur>=slides.length)cur=slides.length-1;update()}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')navigate(1);else if(e.key==='ArrowLeft')navigate(-1)});
+update();
+// Detect F11 fullscreen
+function checkFS(){const fs=window.innerHeight===screen.height;document.body.classList.toggle('is-fs',fs)}
+window.addEventListener('resize',checkFS);checkFS();
+</script>
+</body>
+</html>
