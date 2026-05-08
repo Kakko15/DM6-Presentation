@@ -636,7 +636,34 @@
 
 <script>
 const slides=document.querySelectorAll('.slide'),bar=document.getElementById('progress'),num=document.getElementById('slideNum');
-let cur=0;
+let cur=0,presenterWin=null;
+
+// Speaker notes for each slide
+const speakerNotes=[
+    // Slide 1: Title
+    "Welcome everyone to our presentation on Electricity Consumption Forecasting and Anomaly Detection. We are Group 5 under Topic 5: Mining Time Series and Spatiotemporal Data. Our team consists of Bugauisan and Barlis as Programmers, and Respicio and Gallardo as Researchers. Our instructor is Sir Benedick V. Yamat.",
+    // Slide 2: Background
+    "Let us start with the background. Electricity demand is rising globally due to urbanization and technological advancement. In developing regions like the Philippines, many areas still lack proper monitoring tools, leading to energy inefficiencies and high costs. Time-series forecasting using ARIMA is a proven approach — it is simple, interpretable, and effective on univariate data. We also incorporate anomaly detection to flag unusual consumption patterns.",
+    // Slide 3: Problem Statement
+    "Despite the availability of historical electricity data, many systems fail to use it effectively. Our research addresses three key questions: First, how can we accurately forecast future electricity usage? Second, how can we detect abnormal consumption patterns? And third, how can we integrate both forecasting and anomaly detection to support energy optimization?",
+    // Slide 4: Objectives
+    "Our general objective is to develop a system that forecasts electricity consumption and detects anomalies to support energy optimization. Specifically, we aim to: analyze real-world data using time series techniques, implement ARIMA forecasting, auto-determine optimal parameters, evaluate using MAE, RMSE, and MAPE, detect anomalies with Z-score, and visualize results for practical insights.",
+    // Slide 5: Related Literature
+    "Our work builds on established research. Box et al. established ARIMA as a standard. Hyndman demonstrated its reliability for short-term forecasting. Taylor showed it competes with complex models. Chandola introduced residual-based anomaly detection. The research gap we address is that most studies treat forecasting and anomaly detection separately — we unify them in a single framework.",
+    // Slide 6: Dataset
+    "We use the PJM East dataset, a publicly available electricity load dataset with 145,363 records of hourly consumption measured in megawatts from 2002 onwards. Our preprocessing steps include datetime conversion, chronological sorting, duplicate removal, handling missing values, resampling to daily/weekly/monthly, and an 80/20 train-test split.",
+    // Slide 7: ARIMA Methodology
+    "ARIMA stands for Autoregressive Integrated Moving Average with three parameters: p for autoregressive order, d for differencing degree, and q for moving average order. We use automatic parameter selection through ADF test for stationarity, ACF/PACF for candidate values, and BIC grid search for optimal combination. Forecasts include 95% confidence intervals.",
+    // Slide 8: Anomaly Detection
+    "For anomaly detection, we use the Z-score method. The formula is Z equals value minus mean divided by standard deviation. Any value beyond plus or minus 3 standard deviations is flagged as an anomaly and visualized as red points. These anomalies may indicate peak demand, equipment malfunction, energy theft, or abnormal usage behavior.",
+    // Slide 9: Results
+    "Our results show 138 anomalies detected via Z-score at plus or minus 3 sigma, mostly representing unusually high consumption. We evaluate with three metrics: MAE for average prediction error, RMSE which penalizes large errors, and MAPE for percentage error. All forecasts include 95% confidence intervals that widen for longer forecast horizons.",
+    // Slide 10: Conclusion
+    "In conclusion, ARIMA is effective and interpretable for short-term forecasting. Z-score provides simple, practical anomaly detection. Our integrated system supports energy monitoring and decision-making, deployed as an interactive Streamlit web application. We recommend exploring hybrid models like ARIMA plus LSTM, incorporating weather data, implementing real-time monitoring, and applying ML-based anomaly detection.",
+    // Slide 11: Thank You
+    "Thank you for listening to our presentation. We are now open for questions and discussion. You can also check our project repository on GitHub."
+];
+
 function update(){
     slides.forEach((s,i)=>{s.classList.remove('active','prev');if(i===cur)s.classList.add('active');else if(i<cur)s.classList.add('prev')});
     bar.style.width=`${(cur/(slides.length-1))*100}%`;
@@ -645,17 +672,132 @@ function update(){
     document.getElementById('prevBtn').style.pointerEvents=cur===0?'none':'auto';
     document.getElementById('nextBtn').style.opacity=cur===slides.length-1?'.3':'1';
     document.getElementById('nextBtn').style.pointerEvents=cur===slides.length-1?'none':'auto';
+    // Sync to presenter view
+    localStorage.setItem('pv-slide',cur);
+    if(presenterWin&&!presenterWin.closed) updatePresenter();
 }
 function navigate(d){cur+=d;if(cur<0)cur=0;if(cur>=slides.length)cur=slides.length-1;update()}
-document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')navigate(1);else if(e.key==='ArrowLeft')navigate(-1)});
+document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' ')navigate(1);
+    else if(e.key==='ArrowLeft')navigate(-1);
+    else if(e.key==='p'||e.key==='P')openPresenter();
+});
 update();
+
 // Detect F11 fullscreen
 function checkFS(){const fs=window.innerHeight===screen.height;document.body.classList.toggle('is-fs',fs)}
 window.addEventListener('resize',checkFS);checkFS();
+
 // Touch swipe support for mobile
 let touchX=0;
 document.addEventListener('touchstart',e=>{touchX=e.changedTouches[0].screenX},{passive:true});
 document.addEventListener('touchend',e=>{const diff=touchX-e.changedTouches[0].screenX;if(Math.abs(diff)>50){diff>0?navigate(1):navigate(-1)}},{passive:true});
+
+// Listen for sync from presenter window
+window.addEventListener('storage',e=>{
+    if(e.key==='pv-slide'){const v=parseInt(e.newValue);if(!isNaN(v)&&v!==cur){cur=v;update()}}
+});
+
+// ═══ PRESENTER VIEW ═══
+const slideNames=['Title','Background','Problem Statement','Objectives','Related Literature','Dataset & Preprocessing','ARIMA Methodology','Anomaly Detection','Results','Conclusion & Recommendations','Thank You'];
+
+function openPresenter(){
+    if(presenterWin&&!presenterWin.closed){presenterWin.focus();return}
+    presenterWin=window.open('','PresenterView','width=700,height=540');
+    const d=presenterWin.document;
+    d.write(`<!DOCTYPE html><html><head><title>Presenter View</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Roboto',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none}
+h1,h2,h3,h4{font-family:'Outfit',sans-serif}
+.pv-header{background:linear-gradient(135deg,#202136,#2a2a45);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08)}
+.pv-logo{display:flex;align-items:center;gap:10px;font-family:'Outfit';font-weight:600;font-size:15px;color:#8ab4f8}
+.pv-logo i{font-size:18px}
+.pv-timer{font-family:'Outfit';font-size:28px;font-weight:300;color:#f8d77c;letter-spacing:.04em}
+.pv-body{flex:1;display:grid;grid-template-columns:1fr 280px;gap:0;overflow:hidden}
+.pv-main{padding:24px 28px;overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+.pv-sidebar{background:rgba(255,255,255,.03);border-left:1px solid rgba(255,255,255,.06);padding:20px;display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+.pv-slide-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(66,133,244,.15);color:#8ab4f8;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:500;align-self:flex-start}
+.pv-slide-title{font-size:22px;font-weight:600;color:#fff}
+.pv-notes-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#8ab4f8;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.pv-notes{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:18px 20px;font-size:15px;line-height:1.75;color:#ccc;flex:1}
+.pv-next-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);margin-bottom:4px}
+.pv-next-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px 16px}
+.pv-next-title{font-size:15px;font-weight:500;color:#fff;margin-bottom:6px}
+.pv-next-notes{font-size:12px;color:rgba(255,255,255,.4);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pv-nav{display:flex;gap:10px;padding:14px 24px;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.06);align-items:center;justify-content:center}
+.pv-btn{padding:8px 20px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#e0e0e0;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;font-family:'Roboto'}
+.pv-btn:hover{background:rgba(66,133,244,.2);border-color:rgba(66,133,244,.4);color:#8ab4f8}
+.pv-btn:disabled{opacity:.3;cursor:default}
+.pv-progress{flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin:0 12px}
+.pv-progress-fill{height:100%;background:#8ab4f8;border-radius:2px;transition:width .4s}
+.pv-counter{font-family:'Outfit';font-size:14px;color:rgba(255,255,255,.5);min-width:60px;text-align:center}
+.pv-shortcut{position:absolute;bottom:10px;right:14px;font-size:10px;color:rgba(255,255,255,.2)}
+</style></head><body>
+<div class="pv-header">
+    <div class="pv-logo"><i class="fa-solid fa-tv"></i> Presenter View</div>
+    <div class="pv-timer" id="pvTimer">00:00</div>
+</div>
+<div class="pv-body">
+    <div class="pv-main">
+        <div><span class="pv-slide-badge" id="pvBadge"></span></div>
+        <div class="pv-slide-title" id="pvTitle"></div>
+        <div class="pv-notes-label"><i class="fa-regular fa-note-sticky"></i> Speaker Notes</div>
+        <div class="pv-notes" id="pvNotes"></div>
+    </div>
+    <div class="pv-sidebar">
+        <div class="pv-next-label">Up Next</div>
+        <div class="pv-next-card">
+            <div class="pv-next-title" id="pvNextTitle"></div>
+            <div class="pv-next-notes" id="pvNextNotes"></div>
+        </div>
+    </div>
+</div>
+<div class="pv-nav">
+    <button class="pv-btn" id="pvPrev" onclick="window.opener.navigate(-1)"><i class="fa-solid fa-arrow-left"></i> Prev</button>
+    <div class="pv-progress"><div class="pv-progress-fill" id="pvBar"></div></div>
+    <div class="pv-counter" id="pvCount"></div>
+    <button class="pv-btn" id="pvNext" onclick="window.opener.navigate(1)">Next <i class="fa-solid fa-arrow-right"></i></button>
+</div>
+<div class="pv-shortcut">Press ← → to navigate</div>
+<script>
+document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' ')window.opener.navigate(1);
+    else if(e.key==='ArrowLeft')window.opener.navigate(-1);
+});
+// Timer
+let t=0;setInterval(()=>{t++;const m=String(Math.floor(t/60)).padStart(2,'0');const s=String(t%60).padStart(2,'0');document.getElementById('pvTimer').textContent=m+':'+s},1000);
+</script></body></html>`);
+    d.close();
+    setTimeout(()=>updatePresenter(),100);
+}
+
+function updatePresenter(){
+    if(!presenterWin||presenterWin.closed)return;
+    const d=presenterWin.document;
+    const badge=d.getElementById('pvBadge');
+    const title=d.getElementById('pvTitle');
+    const notes=d.getElementById('pvNotes');
+    const nextTitle=d.getElementById('pvNextTitle');
+    const nextNotes=d.getElementById('pvNextNotes');
+    const pvBar=d.getElementById('pvBar');
+    const pvCount=d.getElementById('pvCount');
+    if(!badge)return;
+    badge.textContent=`Slide ${cur+1} of ${slides.length}`;
+    title.textContent=slideNames[cur]||'';
+    notes.textContent=speakerNotes[cur]||'No notes for this slide.';
+    if(cur<slides.length-1){
+        nextTitle.textContent=slideNames[cur+1];
+        nextNotes.textContent=speakerNotes[cur+1]||'';
+    } else {
+        nextTitle.textContent='End of Presentation';
+        nextNotes.textContent='';
+    }
+    pvBar.style.width=`${(cur/(slides.length-1))*100}%`;
+    pvCount.textContent=`${cur+1} / ${slides.length}`;
+}
 </script>
 </body>
 </html>
