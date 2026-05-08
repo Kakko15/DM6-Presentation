@@ -762,14 +762,14 @@ h1,h2,h3,h4{font-family:'Outfit',sans-serif}
     <button class="pv-btn" id="pvNext" onclick="window.opener.navigate(1)">Next <i class="fa-solid fa-arrow-right"></i></button>
 </div>
 <div class="pv-shortcut">Press ← → to navigate</div>
-<script>
+\x3cscript>
 document.addEventListener('keydown',e=>{
     if(e.key==='ArrowRight'||e.key===' ')window.opener.navigate(1);
     else if(e.key==='ArrowLeft')window.opener.navigate(-1);
 });
 // Timer
 let t=0;setInterval(()=>{t++;const m=String(Math.floor(t/60)).padStart(2,'0');const s=String(t%60).padStart(2,'0');document.getElementById('pvTimer').textContent=m+':'+s},1000);
-</script></body></html>`);
+\x3c/script></body></html>`);
     d.close();
     setTimeout(()=>updatePresenter(),100);
 }
